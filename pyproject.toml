@@ -17,9 +17,12 @@ dependencies = [
     "anthropic",
     "selenium",
     "PyPDF3",
+    "numpy",
     "requests",
+    "html-to-markdown",
     "tqdm",
     "dotenv",
+    "rich",
 ]
 
 [tool.hatch.metadata]
