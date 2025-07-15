@@ -1,0 +1,84 @@
+import logging
+import os
+from urllib.parse import urljoin
+
+import dotenv
+
+from linkedin_ai_matcher.utils import create_logger, sleep_normal
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By, ByType
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+
+class ParseError(Exception): ...
+
+class NoJobsFound(Exception): ...
+
+
+class LinkedinClient:
+    MEAN_DELAY = 1
+    TIMEOUT = 10
+
+    LINKEDIN_URL = "https://www.linkedin.com/"
+    LOGIN_URL = urljoin(LINKEDIN_URL, "login")
+
+    def __init__(
+        self,
+        driver: webdriver.Chrome | None = None,
+        log_in: bool = False,
+        logger: logging.Logger | None = None,
+    ):
+        self.driver = driver or webdriver.Chrome()
+        if log_in:
+            self.login_with_email_password()
+
+        self.logger = logger or create_logger("linkedin_ai_matcher")
+
+        self.logger.info(f"Initialized {self.__class__.__name__}")
+
+    def wait_for_element(self, value: str, by: ByType = By.CLASS_NAME) -> None:
+        """
+        Waits for an element to be present in the DOM.
+        """
+        WebDriverWait(self.driver, self.TIMEOUT).until(
+            EC.presence_of_element_located((by, value))
+        )
+
+    def job_page_from_id(self, job_id: str) -> str:
+        """
+        Constructs the job page URL from the job ID.
+        """
+        return urljoin(self.LINKEDIN_URL, f"/jobs/view/{job_id}/")
+
+    def get_email_password(self) -> tuple[str, str]:
+        """
+        Retrieves the LinkedIn email and password from environment variables.
+        """
+        email = os.getenv("LINKEDIN_EMAIL")
+        password = os.getenv("LINKEDIN_PASSWORD")
+
+        if not email or not password:
+            raise ValueError(
+                "LinkedIn email or password not found in environment variables."
+            )
+
+        return email, password
+
+    def login_with_email_password(self) -> None:
+        email, password = self.get_email_password()
+
+        self.driver.get(self.LOGIN_URL)
+        self.wait_for_element("session_key", By.NAME)
+
+        sleep_normal(self.MEAN_DELAY)
+        self.driver.find_element(By.NAME, "session_key").send_keys(email)
+
+        sleep_normal(self.MEAN_DELAY)
+        self.driver.find_element(By.NAME, "session_password").send_keys(password)
+
+        sleep_normal(self.MEAN_DELAY)
+        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+
+    def __del__(self):
+        self.driver.quit()
