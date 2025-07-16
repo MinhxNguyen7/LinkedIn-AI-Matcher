@@ -6,6 +6,18 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
+class Document(BaseModel):
+    name: str = Field(
+        description="Name of the document",
+    )
+    content: str = Field(
+        description="Stringified content of the document",
+    )
+    format: str = Field(
+        description="Format of the document, e.g., 'pdf', 'docx', 'txt'",
+    )
+
+
 class ApplicantSummary(BaseModel):
     education: str = Field(
         description="Applicant's education background",
