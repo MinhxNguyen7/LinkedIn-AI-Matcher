@@ -16,7 +16,7 @@ dependencies = [
     "streamlit",
     "anthropic",
     "selenium",
-    "PyPDF3",
+    "pymupdf4llm",
     "numpy",
     "requests",
     "html-to-markdown",
