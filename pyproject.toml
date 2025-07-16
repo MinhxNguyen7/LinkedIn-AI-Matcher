@@ -21,6 +21,7 @@ dependencies = [
     "requests",
     "html-to-markdown",
     "tqdm",
+    "pydantic",
     "dotenv",
     "rich",
 ]
