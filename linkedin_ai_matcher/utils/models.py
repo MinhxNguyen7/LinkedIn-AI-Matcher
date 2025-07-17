@@ -25,11 +25,11 @@ class Document(Model):
     name: str = Field(
         description="Name of the document",
     )
-    content: str = Field(
-        description="Stringified content of the document",
-    )
     format: str = Field(
         description="Format of the document, e.g., 'pdf', 'docx', 'txt'",
+    )
+    content: str = Field(
+        description="Stringified content of the document",
     )
 
 
