@@ -3,10 +3,23 @@ Data models
 """
 
 from enum import Enum
+
 from pydantic import BaseModel, Field
 
+from .utils import normalize_markup
 
-class Document(BaseModel):
+
+class Model(BaseModel):
+    def __str__(self) -> str:
+        """
+        Convert the data to an HTML-like markup format.
+        """
+        return normalize_markup(
+            "\n".join(f"<{key}>{value}</{key}>" for key, value in self.model_dump())
+        )
+
+
+class Document(Model):
     name: str = Field(
         description="Name of the document",
     )
@@ -18,7 +31,7 @@ class Document(BaseModel):
     )
 
 
-class ApplicantSummary(BaseModel):
+class ApplicantSummary(Model):
     education: str = Field(
         description="Applicant's education background",
     )
@@ -44,7 +57,7 @@ class JobLevel(Enum):
     C_LEVEL = "C-Level"
 
 
-class JobPreference(BaseModel):
+class JobPreference(Model):
     titles: list[str] = Field(
         description="Preferred job titles",
     )
