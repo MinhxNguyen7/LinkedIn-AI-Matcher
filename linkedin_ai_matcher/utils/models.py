@@ -15,7 +15,9 @@ class Model(BaseModel):
         Convert the data to an HTML-like markup format.
         """
         return normalize_markup(
-            "\n".join(f"<{key}>{value}</{key}>" for key, value in self.model_dump())
+            "\n".join(
+                f"<{key}>{value}</{key}>" for key, value in self.model_dump().items()
+            )
         )
 
 
