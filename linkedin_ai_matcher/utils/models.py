@@ -6,7 +6,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from .utils import normalize_markup
+from .text_manipulation import normalize_markup
 
 
 class Model(BaseModel):

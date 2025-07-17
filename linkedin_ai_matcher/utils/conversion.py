@@ -7,7 +7,7 @@ from pathlib import Path
 import html_to_markdown
 import pymupdf4llm
 
-from linkedin_ai_matcher.models import Document
+from .models import Document
 
 
 def load_file(path: Path) -> Document:
