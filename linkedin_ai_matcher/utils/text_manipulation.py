@@ -1,4 +1,6 @@
+from enum import Enum
 import re
+from typing import Any, Type, TypeVar
 
 
 def extract_tag_content(text: str, tag: str) -> str:
@@ -63,3 +65,32 @@ def normalize_markup(markup: str, tab_size: int = 1) -> str:
             normalized_lines.append(indented_line)
 
     return "\n".join(normalized_lines)
+
+
+EnumT = TypeVar("EnumT", bound=Enum)
+
+
+def enum_from_value(enum_class: Type[EnumT], value: Any) -> EnumT:
+    if value is None:
+        raise ValueError(f"None cannot be converted to {enum_class.__name__}")
+
+    # Try exact match first
+    for member in enum_class:
+        if member.value == value:
+            return member
+
+    # If it's a string, try case-insensitive matching
+    if isinstance(value, str):
+        # Try case-insensitive match
+        value_lower = value.lower()
+        for member in enum_class:
+            if isinstance(member.value, str) and member.value.lower() == value_lower:
+                return member
+
+        # Try matching against member names
+        value_upper = value.upper()
+        for member in enum_class:
+            if member.name == value_upper:
+                return member
+
+    raise ValueError(f"'{value}' is not a valid {enum_class.__name__} value")

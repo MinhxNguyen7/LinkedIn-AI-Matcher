@@ -2,8 +2,8 @@ from linkedin_ai_matcher.utils.log import create_logger
 
 from .llms import LLM
 
-from linkedin_ai_matcher.utils import extract_tag_content
-from linkedin_ai_matcher.utils.models import (
+from linkedin_ai_matcher.utils import extract_tag_content, enum_from_value
+from linkedin_ai_matcher.models import (
     ApplicantInfo,
     JobMatchResult,
     JobInfo,
@@ -105,7 +105,7 @@ class JobMatchChecker:
         reasons = extract_tag_content(response, "reasons")
 
         try:
-            fit = JobFit.from_value(fit_str)
+            fit = enum_from_value(JobFit, fit_str)
         except ValueError as e:
             self.logger.warning(
                 f"Failed to parse fit '{fit_str}': {e}. Defaulting to FAIR."

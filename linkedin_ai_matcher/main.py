@@ -5,7 +5,7 @@ from linkedin_ai_matcher.linkedin import RecommendedIdsScraper, JobPageClient
 from linkedin_ai_matcher.llm import ApplicantSummarizer, AnthropicLLM
 
 from linkedin_ai_matcher.utils import sleep_normal
-from linkedin_ai_matcher.utils.models import ApplicantSummary
+from linkedin_ai_matcher.models import ApplicantSummary
 
 
 def scrape_jobs(n: int = 5):

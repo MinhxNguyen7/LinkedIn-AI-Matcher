@@ -4,7 +4,7 @@ from typing import Iterable
 from tqdm import tqdm
 
 from linkedin_ai_matcher.utils import extract_tag_content, create_logger
-from linkedin_ai_matcher.utils.models import (
+from linkedin_ai_matcher.models import (
     ApplicantSummary,
     Document,
 )
