@@ -41,7 +41,7 @@ class Document(Model):
             content = pymupdf4llm.to_markdown(path)
         elif format == "html":
             # Use html_to_markdown to convert HTML to markdown
-            content = html_to_markdown.convert(path.read_text())
+            content = html_to_markdown.convert_to_markdown(path.read_text())
         elif format in ("txt", "md"):
             # Read text files directly
             content = path.read_text()
