@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import os
 from time import time
+from typing import Any
 
 from anthropic import Anthropic
 from pathlib import Path
@@ -97,6 +98,7 @@ class AnthropicLLM(LLM):
         self,
         model_name: str = "claude-sonnet-4-20250514",
         messages_log_dir: Path | None = None,
+        create_message_kwargs: dict[str, Any] | None = None,
     ):
         """
         Initialize the AnthropicLLM with a model name.
@@ -104,6 +106,7 @@ class AnthropicLLM(LLM):
         :param model_name: The name of the Anthropic model to use.
         """
         super().__init__(model_name, messages_log_dir=messages_log_dir)
+        self.create_message_kwargs = create_message_kwargs or {}
 
     @classmethod
     def _get_client(cls) -> Anthropic:
@@ -120,7 +123,7 @@ class AnthropicLLM(LLM):
             cls._client = Anthropic(api_key=api_key)
         return cls._client
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, **create_message_kwargs: dict[str, Any]) -> str:
         """
         Generate text based on the provided prompt using Anthropic's API.
 
@@ -131,11 +134,15 @@ class AnthropicLLM(LLM):
         client = self._get_client()
 
         try:
+            kwargs = self.create_message_kwargs.copy()
+            kwargs.update(create_message_kwargs)
+
             response = client.messages.create(
                 model=self.model_name,
                 max_tokens=2048,
-                temperature=0,
+                temperature=0.2,
                 messages=[{"role": "user", "content": prompt}],
+                **kwargs,
             )
             return response.content[0].text  # type: ignore
         except Exception as e:
