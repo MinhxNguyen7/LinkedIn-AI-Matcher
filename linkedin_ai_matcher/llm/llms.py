@@ -28,7 +28,7 @@ class LLM(ABC):
         if self.messages_log_dir is not None:
             self.messages_log_dir.mkdir(parents=True, exist_ok=True)
 
-        self.logger = create_logger(__name__, console_output=False)
+        self.logger = create_logger(__class__.__name__, console_output=False)
 
     def __call__(self, prompt: str) -> str:
         """
@@ -93,13 +93,17 @@ class AnthropicLLM(LLM):
     # Lazy initialization
     _client: Anthropic | None = None
 
-    def __init__(self, model_name: str = "claude-sonnet-4-20250514"):
+    def __init__(
+        self,
+        model_name: str = "claude-sonnet-4-20250514",
+        messages_log_dir: Path | None = None,
+    ):
         """
         Initialize the AnthropicLLM with a model name.
 
         :param model_name: The name of the Anthropic model to use.
         """
-        super().__init__(model_name)
+        super().__init__(model_name, messages_log_dir=messages_log_dir)
 
     @classmethod
     def _get_client(cls) -> Anthropic:

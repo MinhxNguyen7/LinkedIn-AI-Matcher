@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Iterable
 
+from tqdm import tqdm
+
 from linkedin_ai_matcher.utils import extract_tag_content, create_logger
 from linkedin_ai_matcher.utils.models import (
     ApplicantSummary,
@@ -15,7 +17,7 @@ CREATE_SUMMARY_PROMPT = """
 **TASK**: Extract relevant information, including education, skills, character, and additional notes from the provided documents to accurately represent the applicant's profile. Before stating the summary, thoroughly analyze the documents and state your thoughts and reasoning leading to the conclusions.
 
 **GUIDANCE**:
-The summary should be concise, informative, and structured. Do not be overly verbose or redundant, and do not include subjective judgements or assumptions.
+The summary should be concise, informative, and structured. Do not be overly verbose or redundant; seek to summarize the key points instead of restating the documents. You may include reasonable deductions based on the content of the documents.
 
 Use the following format in your response:
 
@@ -57,7 +59,7 @@ class ApplicantSummarizer:
             llm (LLM): An instance of the LLM to use for generating summaries.
         """
         self.llm = llm
-        self.logger = create_logger(__name__)
+        self.logger = create_logger(__class__.__name__)
 
         self.logger.info("%s initialized with LLM: %s", __class__, llm.model_name)
 
@@ -77,8 +79,13 @@ class ApplicantSummarizer:
         documents_string = "\n".join(str(document) for document in documents)
         prompt = CREATE_SUMMARY_PROMPT.format(documents=documents_string)
 
+        self.logger.info("Summarizing applicant with LLM.")
         response = self.llm(prompt)
+
         if not response:
+            self.logger.error(
+                "LLM response is empty. Unable to create applicant summary."
+            )
             raise ValueError(
                 "LLM response is empty. Unable to create applicant summary."
             )
@@ -108,7 +115,10 @@ class ApplicantSummarizer:
         Returns:
             ApplicantSummary: A summary of the applicant's education, skills, character, and additional notes.
         """
-        documents = [Document.from_file(path) for path in document_paths]
+        documents = [
+            Document.from_file(path)
+            for path in (tqdm(document_paths, desc="Loading documents"))
+        ]
         documents.extend(additional_documents)
 
         return self.create_applicant_summary(documents)
