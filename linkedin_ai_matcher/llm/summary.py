@@ -14,30 +14,32 @@ from .llms import LLM
 CREATE_SUMMARY_PROMPT = """
 -- INSTRUCTIONS --
 **ROLE**: You are an AI assistant tasked with creating a summary of an applicant based on their documents to determine what kind of job they might be suitable for.
-**TASK**: Extract relevant information, including education, skills, character, and additional notes from the provided documents to accurately represent the applicant's profile. Before stating the summary, thoroughly analyze the documents and state your thoughts and reasoning leading to the conclusions.
+**TASK**: Extract relevant information to accurately represent the applicant's profile.
 
 **GUIDANCE**:
-- The summary should be concise, informative, and structured. 
+- The summary should be concise, informative, and unopinionated. 
+- Before stating the summary, thoroughly and critically analyze the documents.
 - Do not be overly verbose or redundant; seek to summarize the key points instead of restating the documents. 
-- You may include reasonable deductions based on the content of the documents, especially if it would help in deciding whether an applicant is suitable for a position.
+- You may include reasonable deductions based on the content of the documents, especially if it would help in determining an applicant's fit.
+- Note the level of experience and career level.
 - Use the following format in your response:
 
 <thinking>
-    (thoughts)
+    [brief thoughts and reasoning leading to the conclusions]
 </thinking>
 
 <ApplicantSummary>
     <education>
-        (education)
+        [notes about education]
     </education>
     <skills>
-        (skills)
+        [notes about skills, including specific technical skills, industry knowledge, soft skills, and years of experience (overall and in key areas, if applicable)]
     </skills>
     <character>
-        (character)
+        [notes about character traits and interpersonal skills]
     </character>
     <additional_notes>
-        (additional_notes)
+        [additional_notes, including other relevant information as well as useful details/deductions for job matching]
     </additional_notes>
 </ApplicantSummary>
 
