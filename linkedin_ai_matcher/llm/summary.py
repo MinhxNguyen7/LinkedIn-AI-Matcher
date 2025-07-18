@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Iterable
 
 from linkedin_ai_matcher.utils import extract_tag_content, create_logger
@@ -90,3 +91,24 @@ class ApplicantSummarizer:
             character=extract_tag_content(response, "character"),
             additional_notes=extract_tag_content(response, "additional_notes"),
         )
+
+    def summary_from_paths(
+        self,
+        document_paths: Iterable[Path],
+        additional_documents: Iterable[Document] = (),
+    ) -> ApplicantSummary:
+        """
+        Create an applicant summary from a list of document paths and additional documents.
+
+        Args:
+            document_paths (Iterable[Path]): Paths to the documents containing applicant information.
+            additional_documents (Iterable[Document], optional): Additional documents to include in the summary,
+                e.g., a user-inputted text block.
+
+        Returns:
+            ApplicantSummary: A summary of the applicant's education, skills, character, and additional notes.
+        """
+        documents = [Document.from_file(path) for path in document_paths]
+        documents.extend(additional_documents)
+
+        return self.create_applicant_summary(documents)
