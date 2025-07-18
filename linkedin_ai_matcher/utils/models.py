@@ -3,7 +3,10 @@ Data models
 """
 
 from enum import Enum
+from pathlib import Path
 
+import html_to_markdown
+import pymupdf4llm
 from pydantic import BaseModel, Field
 
 from .text_manipulation import normalize_markup
@@ -31,6 +34,28 @@ class Document(Model):
     content: str = Field(
         description="Stringified content of the document",
     )
+
+    @staticmethod
+    def from_file(path: Path) -> "Document":
+        """
+        Load the file as a string, converting it if necessary.
+        """
+        name = path.stem
+        extension = path.suffix.lower()[1:]
+
+        match extension:
+            case "txt" | "md":
+                content = path.read_text(encoding="utf-8")
+            case "html":
+                content = html_to_markdown.convert_to_markdown(
+                    path.read_text(encoding="utf-8")
+                )
+            case "pdf":
+                content = pymupdf4llm.to_markdown(path)
+            case _:
+                raise ValueError(f"Unsupported file format: {extension}")
+
+        return Document(name=name, content=content, format=extension)
 
 
 class ApplicantSummary(Model):
