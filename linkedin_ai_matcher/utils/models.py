@@ -4,6 +4,7 @@ Data models
 
 from enum import Enum
 from pathlib import Path
+from typing import TypeVar, Type, Any
 
 import html_to_markdown
 import pymupdf4llm
@@ -22,6 +23,39 @@ class Model(BaseModel):
                 f"<{key}>{value}</{key}>" for key, value in self.model_dump().items()
             )
         )
+
+
+class BetterEnum(Enum):
+    FactoryReturnT = TypeVar("FactoryReturnT", bound="BetterEnum")
+
+    @classmethod
+    def from_value(cls: Type[FactoryReturnT], value: Any) -> FactoryReturnT:
+        if value is None:
+            raise ValueError(f"None cannot be converted to {cls.__name__}")
+
+        # Try exact match first
+        for member in cls:
+            if member.value == value:
+                return member
+
+        # If it's a string, try case-insensitive matching
+        if isinstance(value, str):
+            # Try case-insensitive match
+            value_lower = value.lower()
+            for member in cls:
+                if (
+                    isinstance(member.value, str)
+                    and member.value.lower() == value_lower
+                ):
+                    return member
+
+            # Try matching against member names
+            value_upper = value.upper()
+            for member in cls:
+                if member.name == value_upper:
+                    return member
+
+        raise ValueError(f"'{value}' is not a valid {cls.__name__} value")
 
 
 class Document(Model):
@@ -84,13 +118,55 @@ class JobLevel(Enum):
     C_LEVEL = "C-Level"
 
 
-class JobPreference(Model):
-    titles: list[str] = Field(
-        description="Preferred job titles",
+class ApplicantInfo(Model):
+    """
+    Information about the applicant, including their summary and preferences,
+    used to compare against job postings.
+    """
+
+    applicant_summary: ApplicantSummary = Field(
+        description="Generated and possibly user-modified summary of the applicant",
     )
-    levels: list[JobLevel] = Field(
-        description="Preferred job levels",
+    additional_preferences: str = Field(
+        description="Additional preferences for the job match provided by the user",
     )
-    additional_notes: str = Field(
-        description="Additional notes about job preferences",
+
+
+class JobContent(Model):
+    title: str = Field(
+        description="Title of the job",
+    )
+    company: str = Field(
+        description="Company offering the job",
+    )
+    description: str = Field(
+        description="Description of the job",
+    )
+
+
+class JobInfo(Model):
+    id: str = Field(
+        description="Unique identifier for the job posting",
+    )
+    content: JobContent = Field(
+        description="Content of the job posting",
+    )
+
+
+class JobFit(BetterEnum):  # type: ignore[misc]
+    EXCELLENT = "Excellent"
+    GOOD = "Good"
+    FAIR = "Fair"
+    POOR = "Poor"
+
+
+class JobMatchResult(Model):
+    job_info: JobInfo = Field(
+        description="Information about the job",
+    )
+    fit: JobFit = Field(
+        description="How well the job matches the applicant",
+    )
+    reasons: str = Field(
+        description="Reasons for the match score",
     )
