@@ -17,9 +17,10 @@ CREATE_SUMMARY_PROMPT = """
 **TASK**: Extract relevant information, including education, skills, character, and additional notes from the provided documents to accurately represent the applicant's profile. Before stating the summary, thoroughly analyze the documents and state your thoughts and reasoning leading to the conclusions.
 
 **GUIDANCE**:
-The summary should be concise, informative, and structured. Do not be overly verbose or redundant; seek to summarize the key points instead of restating the documents. You may include reasonable deductions based on the content of the documents.
-
-Use the following format in your response:
+- The summary should be concise, informative, and structured. 
+- Do not be overly verbose or redundant; seek to summarize the key points instead of restating the documents. 
+- You may include reasonable deductions based on the content of the documents, especially if it would help in deciding whether an applicant is suitable for a position.
+- Use the following format in your response:
 
 <thinking>
     (thoughts)
