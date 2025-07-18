@@ -93,7 +93,7 @@ class AnthropicLLM(LLM):
     # Lazy initialization
     _client: Anthropic | None = None
 
-    def __init__(self, model_name: str = "claude-3-sonnet-20240229"):
+    def __init__(self, model_name: str = "claude-sonnet-4-20250514"):
         """
         Initialize the AnthropicLLM with a model name.
 
