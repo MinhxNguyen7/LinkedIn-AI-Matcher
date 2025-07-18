@@ -1,10 +1,13 @@
 from linkedin_ai_matcher.utils.log import create_logger
 
 from .llms import LLM
+
+from linkedin_ai_matcher.utils import extract_tag_content
 from linkedin_ai_matcher.utils.models import (
     ApplicantInfo,
     JobMatchResult,
     JobInfo,
+    JobFit,
 )
 
 
@@ -97,9 +100,6 @@ class JobMatchChecker:
             raise ValueError("LLM response is empty. Unable to check job match.")
 
         self.logger.info("LLM response received for job match check.")
-
-        from linkedin_ai_matcher.utils import extract_tag_content
-        from linkedin_ai_matcher.utils.models import JobFit
 
         fit_str = extract_tag_content(response, "fit").strip()
         reasons = extract_tag_content(response, "reasons")
