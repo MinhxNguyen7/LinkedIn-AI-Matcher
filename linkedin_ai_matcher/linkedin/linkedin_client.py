@@ -38,9 +38,9 @@ class LinkedinClient:
                 self.logger.info("Cookie login failed, trying email/password login.")
                 self.login_with_email_password()
 
-        self.logger = logger or create_logger("linkedin_ai_matcher")
+        self.logger = logger or create_logger(__class__.__name__)
 
-        self.logger.info(f"Initialized {self.__class__.__name__}")
+        self.logger.info(f"Initialized {__class__.__name__}")
 
     def wait_for_element(self, value: str, by: ByType = By.CLASS_NAME) -> None:
         """
@@ -109,4 +109,5 @@ class LinkedinClient:
         self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
     def __del__(self):
-        self.driver.quit()
+        self.driver.close()
+        self.logger.info(f"Closed {__class__.__name__} driver.")
