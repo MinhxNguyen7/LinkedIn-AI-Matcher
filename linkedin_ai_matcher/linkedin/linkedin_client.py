@@ -11,7 +11,9 @@ from selenium.webdriver.common.by import By, ByType
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+
 class ParseError(Exception): ...
+
 
 class NoJobsFound(Exception): ...
 
@@ -27,9 +29,10 @@ class LinkedinClient:
         self,
         driver: webdriver.Chrome | None = None,
         log_in: bool = False,
+        chrome_options: webdriver.ChromeOptions | None = None,
         logger: logging.Logger | None = None,
     ):
-        self.driver = driver or webdriver.Chrome()
+        self.driver = driver or webdriver.Chrome(options=chrome_options)
         if log_in:
             self.login_with_email_password()
 
