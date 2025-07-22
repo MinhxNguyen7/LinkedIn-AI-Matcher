@@ -10,8 +10,22 @@ from linkedin_ai_matcher.utils import sleep_normal
 from linkedin_ai_matcher.models import ApplicantSummary, ApplicantInfo, JobInfo
 
 
+def scrape_job_ids(n: int = 5) -> Iterable[str]:
+    """
+    Scrape job IDs from LinkedIn's recommended jobs page.
+
+    Args:
+        n (int): Number of job IDs to scrape.
+
+    Returns:
+        Iterable[str]: A generator yielding job IDs.
+    """
+    ids_scraper = RecommendedIdsScraper()
+    return ids_scraper.scrape_job_ids(n)
+
+
 def scrape_jobs(n: int = 5):
-    ids_scraper = RecommendedIdsScraper(log_in=True)
+    ids_scraper = RecommendedIdsScraper()
     job_client = JobPageClient(log_in=True)
 
     for job_id in ids_scraper.scrape_job_ids(n):
@@ -49,7 +63,7 @@ def end_to_end(
     additional_preferences: str = "",
     n_jobs: int = 5,
 ):
-    ids_scraper = RecommendedIdsScraper(log_in=True)
+    ids_scraper = RecommendedIdsScraper()
     job_client = JobPageClient(log_in=True)
 
     applicant_summary = summarize(document_paths)
@@ -86,10 +100,11 @@ def end_to_end(
 
 
 if __name__ == "__main__":
+    print(list(scrape_job_ids(40)))
     # scrape_jobs()
     # summary = summarize([Path("./.data/resume1.pdf"), Path("./.data/resume2.pdf")])
-    end_to_end(
-        document_paths=[Path("./.data/resume1.pdf"), Path("./.data/resume2.pdf")],
-        additional_preferences="Full time positions (not internships).",
-        n_jobs=20,
-    )
+    # end_to_end(
+    #     document_paths=[Path("./.data/resume1.pdf"), Path("./.data/resume2.pdf")],
+    #     additional_preferences="I'm a US citizen looking for full time positions (not internships)",
+    #     n_jobs=20,
+    # )
