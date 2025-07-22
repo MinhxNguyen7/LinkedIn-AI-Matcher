@@ -34,7 +34,9 @@ class LinkedinClient:
     ):
         self.driver = driver or webdriver.Chrome(options=chrome_options)
         if log_in:
-            self.login_with_email_password()
+            if not self.login_with_cookie():
+                self.logger.info("Cookie login failed, trying email/password login.")
+                self.login_with_email_password()
 
         self.logger = logger or create_logger("linkedin_ai_matcher")
 
@@ -67,6 +69,29 @@ class LinkedinClient:
             )
 
         return email, password
+
+    def login_with_cookie(self) -> bool:
+        """
+        Logs in using cookie (`li_at`) provided in the environment variable.
+
+        Returns:
+            bool: True if login was successful, False otherwise.
+        """
+        cookie = os.getenv("LINKEDIN_COOKIE")
+        if not (cookie and cookie.startswith("AQEDAT")):
+            return False
+
+        self.driver.get(self.LINKEDIN_URL)
+        self.driver.add_cookie({"name": "li_at", "value": cookie})
+        self.driver.refresh()
+
+        # Check if login was successful
+        try:
+            self.wait_for_element("global-nav", By.ID)
+            return True
+        except Exception as e:
+            self.logger.error(f"Login failed: {e}")
+            return False
 
     def login_with_email_password(self) -> None:
         email, password = self.get_email_password()
