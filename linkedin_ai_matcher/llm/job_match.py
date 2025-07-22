@@ -20,7 +20,7 @@ JOB_MATCH_PROMPT = """
 - Be objective and unopinionated in your assessment.
 - Judge the match critically, and provide clear reasoning for your decision.
 - Use specific examples from the applicant profile and job information to support your assessment.
-- Consider the following factors:
+- Consider the following factors (if applicable):
   * Technical skills alignment (required vs. preferred)
   * Experience level match (junior, mid-level, senior)
   * Domain/industry experience relevance
