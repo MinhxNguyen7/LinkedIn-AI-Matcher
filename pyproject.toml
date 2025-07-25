@@ -16,6 +16,7 @@ dependencies = [
     "streamlit",
     "anthropic",
     "selenium",
+    "SQLAlchemy",
     "pymupdf4llm",
     "numpy",
     "requests",
