@@ -1,6 +1,6 @@
 from abc import ABC
 
-from sqlalchemy import Integer, String
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
 
@@ -22,7 +22,7 @@ class Job(Base):
 class Match(Base):
     __tablename__ = "matches"
 
-    job_id: Mapped[str] = mapped_column(String, primary_key=True)
+    job_id: Mapped[str] = mapped_column(ForeignKey("jobs.id"), primary_key=True)
     fit: Mapped[str] = mapped_column(String, nullable=False)
     reasons: Mapped[str] = mapped_column(String, nullable=False)
 
