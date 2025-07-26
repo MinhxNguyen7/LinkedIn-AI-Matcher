@@ -1,6 +1,6 @@
 from abc import ABC
 
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
 
@@ -10,7 +10,7 @@ class Base(DeclarativeBase): ...
 class Job(Base):
     __tablename__ = "jobs"
 
-    id: Mapped[Integer] = mapped_column(Integer, primary_key=True)
+    id: Mapped[str] = mapped_column(String, primary_key=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
     company: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str] = mapped_column(String, nullable=False)
