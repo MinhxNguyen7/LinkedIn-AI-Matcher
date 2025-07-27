@@ -103,8 +103,13 @@ class JobMatchManager:
 
             self._logger.info(f"Processing job ID: {job_id}")
 
-            self._job_page_client.open_job_page(job_id)
-            content = self._job_page_client.extract_job_content()
+            try:
+                self._job_page_client.open_job_page(job_id)
+                content = self._job_page_client.extract_job_content()
+
+            except Exception as e:
+                self._logger.error(f"Failed to process job ID {job_id}: {e}")
+                content = None
 
             if content:
                 job_info = JobInfo(id=job_id, content=content)
@@ -138,6 +143,7 @@ class JobMatchManager:
                 .on_conflict_do_nothing()
             )
             session.execute(statement)
+            session.commit()
 
         self._logger.info(f"Job info upserted into database: {job_info.id}")
         return True
@@ -151,12 +157,21 @@ class JobMatchManager:
         )
 
         with Session(get_engine()) as session:
-            match = Match(
-                job_id=match_result.job_info.id,
-                fit=match_result.fit.value,
-                reasons=match_result.reasons,
+            statement = (
+                insert(Match)
+                .values(
+                    job_id=match_result.job_info.id,
+                    fit=match_result.fit.value,
+                    reasons=match_result.reasons,
+                )
             )
-            session.add(match)
+            session.execute(
+                statement.on_conflict_do_update(
+                    index_elements=["job_id"],
+                    set_=dict(fit=match_result.fit.value, reasons=match_result.reasons),
+                )
+            )
+            session.commit()
 
     def _check_job_matches(self) -> None:
         """
