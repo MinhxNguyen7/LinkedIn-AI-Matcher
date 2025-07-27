@@ -1,5 +1,4 @@
 from threading import Thread
-from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 
 from sqlalchemy.orm import Session
@@ -138,6 +137,7 @@ class JobMatchManager:
                 )
                 .on_conflict_do_nothing()
             )
+            session.execute(statement)
 
         self._logger.info(f"Job info upserted into database: {job_info.id}")
         return True
@@ -164,7 +164,7 @@ class JobMatchManager:
         """
         self._logger.info("Starting to check job matches.")
 
-        while not self._jobs_queue.empty():
+        while True:
             job_info = self._jobs_queue.get()
 
             if job_info is None:
@@ -208,12 +208,19 @@ class JobMatchManager:
         )
         process_thread.start()
 
-        match_executor = ThreadPoolExecutor(max_workers=num_llm_threads)
-        for _ in range(num_llm_threads):
-            match_executor.submit(self._check_job_matches)
+        job_match_threads = [
+            Thread(
+                target=self._check_job_matches,
+                name=f"JobMatchCheckerThread-{i}",
+            )
+            for i in range(num_llm_threads)
+        ]
+        for thread in job_match_threads:
+            thread.start()
 
         # Wait for all threads to finish
         loader_thread.join()
         ids_thread.join()
         process_thread.join()
-        match_executor.shutdown(wait=True)
+        for thread in job_match_threads:
+            thread.join()
