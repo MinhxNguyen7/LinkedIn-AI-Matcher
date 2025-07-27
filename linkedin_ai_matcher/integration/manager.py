@@ -125,14 +125,17 @@ class JobMatchManager:
         self._logger.info(f"Saving job info to database: {job_info.id}")
 
         with Session(get_engine()) as session:
-            job = Job(
-                id=job_info.id,
-                title=job_info.content.title,
-                company=job_info.content.company,
-                description=job_info.content.description,
+            statement = (
+                insert(Job)
+                .values(
+                    id=job_info.id,
+                    title=job_info.content.title,
+                    company=job_info.content.company,
+                    description=job_info.content.description,
+                )
+                .on_conflict_do_nothing()
             )
-            session.add(job)
-            session.commit()
+            session.execute(statement)
 
         self._logger.info(f"Job info saved to database: {job_info.id}")
         return True
