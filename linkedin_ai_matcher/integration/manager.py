@@ -112,7 +112,9 @@ class JobMatchManager:
                 self._save_job_to_db(job_info)
                 self._jobs_queue.put(job_info)
 
-                self._logger.info(f"Processed job ID: {job_id} with content: {content}")
+                self._logger.info(
+                    f"Processed job ({job_id}): {content.title} @ {content.company}"
+                )
             else:
                 self._logger.warning(f"No content found for job ID: {job_id}")
 
@@ -135,9 +137,8 @@ class JobMatchManager:
                 )
                 .on_conflict_do_nothing()
             )
-            session.execute(statement)
 
-        self._logger.info(f"Job info saved to database: {job_info.id}")
+        self._logger.info(f"Job info upserted into database: {job_info.id}")
         return True
 
     def _save_match_to_db(self, match_result: JobMatchResult) -> None:
