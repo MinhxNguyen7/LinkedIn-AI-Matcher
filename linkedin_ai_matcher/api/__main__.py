@@ -1,7 +1,7 @@
 from collections import defaultdict
 import json
 
-from flask import Flask, Response, jsonify
+from flask import Flask, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
