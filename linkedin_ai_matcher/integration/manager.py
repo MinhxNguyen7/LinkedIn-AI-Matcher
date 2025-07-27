@@ -90,7 +90,7 @@ class JobMatchManager:
         Also adds the job information to the database.
         """
         self._logger.info("Starting to process job IDs.")
-        while not self._ids_queue.empty():
+        while True:
             job_id = self._ids_queue.get()
 
             if job_id is None:
