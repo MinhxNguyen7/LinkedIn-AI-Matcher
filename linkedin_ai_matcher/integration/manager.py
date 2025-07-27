@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy import select
 
 from linkedin_ai_matcher.linkedin import JobPageClient, RecommendedIdsScraper
