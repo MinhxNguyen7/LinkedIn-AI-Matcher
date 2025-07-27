@@ -88,6 +88,8 @@ class RecommendedIdsScraper(LinkedinClient):
                     num_scraped += 1
                     if num_scraped >= num_jobs:
                         return
+                    
+                    sleep_normal(self.MEAN_DELAY)
 
             except NoJobsFound:
                 self.logger.info("No more jobs found on the recommended page.")

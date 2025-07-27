@@ -19,7 +19,7 @@ class NoJobsFound(Exception): ...
 
 
 class LinkedinClient:
-    MEAN_DELAY = 1
+    MEAN_DELAY = 2
     TIMEOUT = 10
 
     LINKEDIN_URL = "https://www.linkedin.com/"
