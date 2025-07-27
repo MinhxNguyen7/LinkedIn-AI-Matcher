@@ -75,16 +75,21 @@ class LLM(ABC):
         """
         if self.messages_log_dir is None:
             return
+        
+        try:
+            with open(self.messages_log_dir / f"{int(timestamp)}_prompt.log", "x") as f:
+                f.write(prompt)
 
-        with open(self.messages_log_dir / f"{int(timestamp)}_prompt.log", "x") as f:
-            f.write(prompt)
-
-        if response is not None:
-            with open(
-                self.messages_log_dir / f"{int(timestamp)}_response.log", "x"
-            ) as f:
-                f.write(response)
-
+            if response is not None:
+                with open(
+                    self.messages_log_dir / f"{int(timestamp)}_response.log", "x"
+                ) as f:
+                    f.write(response)
+        except FileExistsError:
+            self.logger.error(
+                "Log files already exist for timestamp %s. Skipping logging.",
+                int(timestamp),
+            )
 
 class AnthropicLLM(LLM):
     """
