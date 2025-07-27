@@ -121,6 +121,8 @@ def full_test(
         additional_preferences=additional_preferences,
     )
 
+    executor.shutdown(wait=True)
+
     job_match_manager = JobMatchManager(
         applicant=applicant_info,
         ids_scraper=ids_scraper,
