@@ -40,3 +40,9 @@ class Model(BaseModel):
                 f"<{key}>{value}</{key}>" for key, value in self.model_dump().items()
             )
         )
+
+    def toJSON(self) -> str:
+        """
+        Convert the model to a JSON string.
+        """
+        return self.model_dump_json()
