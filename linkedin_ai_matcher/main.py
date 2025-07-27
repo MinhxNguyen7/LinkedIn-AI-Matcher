@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Iterable
 import csv
+from concurrent.futures import ThreadPoolExecutor
 
 
 from linkedin_ai_matcher.linkedin import RecommendedIdsScraper, JobPageClient
@@ -102,12 +103,19 @@ def end_to_end(
 def full_test(
     document_paths: Iterable[Path], additional_preferences: str = "", n_jobs: int = 100
 ):
-    ids_scraper = RecommendedIdsScraper()
-    job_client = JobPageClient(log_in=True)
-
-    applicant_summary = summarize(document_paths)
+    # Concurrently set up scraping and perform applicant summarization
+    executor = ThreadPoolExecutor(max_workers=3)
+    ids_scraper_future = executor.submit(RecommendedIdsScraper)
+    job_client_future = executor.submit(JobPageClient, log_in=True)
+    applicant_future = executor.submit(summarize, document_paths)
 
     matcher = JobMatchChecker(AnthropicLLM(messages_log_dir=Path("./.logs/llm")))
+
+    ids_scraper = ids_scraper_future.result()
+    job_client = job_client_future.result()
+
+    applicant_summary = applicant_future.result()
+
     applicant_info = ApplicantInfo(
         applicant_summary=applicant_summary,
         additional_preferences=additional_preferences,
