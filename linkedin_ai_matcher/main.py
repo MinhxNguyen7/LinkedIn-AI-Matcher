@@ -5,9 +5,9 @@ import csv
 
 from linkedin_ai_matcher.linkedin import RecommendedIdsScraper, JobPageClient
 from linkedin_ai_matcher.llm import ApplicantSummarizer, AnthropicLLM, JobMatchChecker
-
 from linkedin_ai_matcher.utils import sleep_normal
 from linkedin_ai_matcher.models import ApplicantSummary, ApplicantInfo, JobInfo
+from linkedin_ai_matcher.integration import JobMatchManager
 
 
 def scrape_job_ids(n: int = 5) -> Iterable[str]:
@@ -99,12 +99,34 @@ def end_to_end(
         writer.writerow([job_id, result.fit.value, result.reasons])
 
 
+def full_test(
+    document_paths: Iterable[Path], additional_preferences: str = "", n_jobs: int = 100
+):
+    ids_scraper = RecommendedIdsScraper()
+    job_client = JobPageClient(log_in=True)
+
+    applicant_summary = summarize(document_paths)
+
+    matcher = JobMatchChecker(AnthropicLLM(messages_log_dir=Path("./.logs/llm")))
+    applicant_info = ApplicantInfo(
+        applicant_summary=applicant_summary,
+        additional_preferences=additional_preferences,
+    )
+
+    job_match_manager = JobMatchManager(
+        applicant=applicant_info,
+        ids_scraper=ids_scraper,
+        job_page_client=job_client,
+        job_match_checker=matcher,
+    )
+
+    job_match_manager.run(n_jobs)
+
+
 if __name__ == "__main__":
-    print(list(scrape_job_ids(40)))
-    # scrape_jobs()
-    # summary = summarize([Path("./.data/resume1.pdf"), Path("./.data/resume2.pdf")])
-    # end_to_end(
-    #     document_paths=[Path("./.data/resume1.pdf"), Path("./.data/resume2.pdf")],
-    #     additional_preferences="I'm a US citizen looking for full time positions (not internships)",
-    #     n_jobs=20,
-    # )
+    DOCS_DIR = Path(".data/documents")
+    document_paths = list(DOCS_DIR.rglob("*.pdf"))
+    full_test(
+        document_paths=document_paths,
+        additional_preferences="I'm a US citizen looking for full time positions (not internships)",
+    )
