@@ -156,7 +156,6 @@ class JobMatchManager:
                 reasons=match_result.reasons,
             )
             session.add(match)
-            session.commit()
 
     def _check_job_matches(self) -> None:
         """
